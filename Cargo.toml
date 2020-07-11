@@ -1,0 +1,23 @@
+[package]
+name = "inky-dash"
+version = "0.1.0"
+authors = ["Matthias Wolf <m@sushinara.net>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+embedded-graphics = "0.5.2"
+gpio-cdev = "0.3.0"
+profont = "0.3.0"
+
+[dependencies.ssd1675]
+version = "0.2.0"
+features = ["graphics"]
+git = "https://github.com/Thra11/ssd1675.git"
+branch = "inky-what-2"
+
+[dependencies.linux-embedded-hal]
+version = "0.3"
+features = ["gpio_cdev"]
+git = "https://github.com/rust-embedded/linux-embedded-hal.git"
