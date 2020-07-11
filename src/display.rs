@@ -93,31 +93,6 @@ impl<'a> Inky<'a> {
                 .expect("reset request"),
         )
         .expect("reset pin");
-        // let cs = CdevPin::new(8); // BCM8
-        // cs.export().expect("cs export");
-        // while !cs.is_exported() {}
-        // cs.set_direction(Direction::Out).expect("CS Direction");
-        // cs.set_value(1).expect("CS Value set to 1");
-
-        // let busy = CdevPin::new(17); // BCM17
-        // busy.export().expect("busy export");
-        // while !busy.is_exported() {}
-        // busy.set_direction(Direction::In).expect("busy Direction");
-
-        // let dc = CdevPin::new(22); // BCM22
-        // dc.export().expect("dc export");
-        // while !dc.is_exported() {}
-        // dc.set_direction(Direction::Out).expect("dc Direction");
-        // dc.set_value(1).expect("dc Value set to 1");
-
-        // let reset = CdevPin::new(27); // BCM27
-        // reset.export().expect("reset export");
-        // while !reset.is_exported() {}
-        // reset
-        //     .set_direction(Direction::Out)
-        //     .expect("reset Direction");
-        // reset.set_value(1).expect("reset Value set to 1");
-        println!("Pins configured");
 
         let controller = ssd1675::Interface::new(spi, cs, busy, dc, reset);
         let config = Builder::new()
