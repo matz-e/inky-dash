@@ -19,11 +19,7 @@ const COLS: u16 = 400;
 const ROWS: u16 = 300;
 
 fn main() {
-    println!("{:?}", Services::new().expect("dbus").state("gdm"));
-    println!("{:?}", Services::new().expect("dbus").state("sshd"));
-    println!("{:?}", Services::new().expect("dbus").state("syncthing@matze"));
-    println!("{:?}", Services::new().expect("dbus").state("foob"));
-    println!("{:?}", Services::new().expect("dbus").state("mpd"));
+    let services = vec!["sshd", "syncthing@matze", "smb", "mpd", "nfs"];
     let mut black_buffer = [255u8; ROWS as usize * COLS as usize];
     let mut red_buffer = [0u8; ROWS as usize * COLS as usize];
     let mut inky = Inky::new(
@@ -42,12 +38,22 @@ fn main() {
                 .into_iter(),
         );
         d.draw(
-            ProFont9Point::render_str("We're somewhat useless right now")
+            ProFont12Point::render_str("We're somewhat useless right now")
                 .stroke(Some(Color::Red))
                 .fill(Some(Color::White))
                 .translate(Coord::new(1, 30))
                 .into_iter(),
         );
+        for (i, s) in services.iter().enumerate() {
+            d.draw(
+                ProFont9Point::render_str(s)
+                    .stroke(Some(Color::Black))
+                    .fill(Some(Color::White))
+                    .translate(Coord::new(1, ROWS as i32 - 1 - (i as i32 + 1) * 11))
+                    .into_iter()
+            );
+        }
+    println!("{:?}", Services::new().expect("dbus").state("sshd"));
     })
     .expect("failed to draw");
 }

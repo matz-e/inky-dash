@@ -1,0 +1,6 @@
+[target.arm-unknown-linux-gnueabihf]
+rustflags = "-C link_arg=-Wl,-rpath,/lib/arm-linux-gnueabihf,-rpath-link,/lib/arm-linux-gnueabihf,-rpath,/usr/lib/arm-linux-gnueabihf,-rpath-link,/usr/lib/arm-linux-gnueabihf"
+
+[target.arm-unknown-linux-gnueabihf.dbus]
+rustc-link-search = ["/lib/arm-linux-gnueabihf", "/usr/lib/arm-linux-gnueabihf"]
+rustc-link-lib = ["dbus-1", "systemd"]
