@@ -29,7 +29,10 @@ impl Services {
     }
 
     fn _state(&self, service: &str) -> Result<Status, Box<dyn std::error::Error>> {
-        let interface = Path::new(format!("/org/freedesktop/systemd1/unit/{}_2eservice", service.replace("@", "_40")))?;
+        let interface = Path::new(format!(
+            "/org/freedesktop/systemd1/unit/{}_2eservice",
+            service.replace("@", "_40")
+        ))?;
         let proxy = self.conn.with_proxy(
             "org.freedesktop.systemd1",
             interface,
