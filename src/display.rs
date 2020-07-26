@@ -7,7 +7,7 @@ use linux_embedded_hal::sysfs_gpio::Direction;
 use linux_embedded_hal::Delay;
 use linux_embedded_hal::{CdevPin, Spidev};
 
-use crate::ssd1675::{Builder, Dimensions, Display, GraphicDisplay, Rotation};
+use crate::ssd1675::{self, Builder, Dimensions, GraphicDisplay, Rotation};
 
 #[rustfmt::skip]
 const LUT: [u8; 70] = [
@@ -38,8 +38,10 @@ type Interface = ssd1675::interface::Interface<
     linux_embedded_hal::CdevPin,
 >;
 
+pub type Display<'a> = GraphicDisplay<'a, Interface>;
+
 pub struct Inky<'a> {
-    display: GraphicDisplay<'a, Interface>,
+    display: Display<'a>,
     delay: Delay,
 }
 
@@ -101,7 +103,7 @@ impl<'a> Inky<'a> {
             .lut(&LUT)
             .build()
             .expect("invalid configuration");
-        let display = Display::new(controller, config);
+        let display = ssd1675::Display::new(controller, config);
         let display = GraphicDisplay::new(display, black_buffer, red_buffer);
         let delay = Delay {};
         Inky { delay, display }

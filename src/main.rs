@@ -10,7 +10,7 @@ use embedded_graphics::prelude::*;
 use embedded_graphics::Drawing;
 
 mod display;
-use display::Inky;
+use display::{Display, Inky};
 
 mod service;
 use service::{Services, Status};
@@ -18,36 +18,21 @@ use service::{Services, Status};
 const COLS: u16 = 400;
 const ROWS: u16 = 300;
 
-fn main() {
-    let services = vec!["sshd", "syncthing@matze", "smb", "mpd", "nfs"];
+struct ServiceDisplay<'a> {
+    systemd: Services,
+    names: &'a [&'a str],
+}
 
-    let mut black_buffer = [255u8; ROWS as usize * COLS as usize];
-    let mut red_buffer = [0u8; ROWS as usize * COLS as usize];
-    let mut inky = Inky::new(
-        COLS,
-        ROWS,
-        Rotation::Rotate0,
-        &mut black_buffer,
-        &mut red_buffer,
-    );
-    let systemd = Services::new().expect("dbus");
-    inky.display(|d| {
-        d.draw(
-            ProFont24Point::render_str("TEST")
-                .stroke(Some(Color::Black))
-                .fill(Some(Color::White))
-                .translate(Coord::new(1, 1))
-                .into_iter(),
-        );
-        d.draw(
-            ProFont12Point::render_str("We're somewhat useless right now")
-                .stroke(Some(Color::Red))
-                .fill(Some(Color::White))
-                .translate(Coord::new(1, 30))
-                .into_iter(),
-        );
-        for (i, service) in services.iter().enumerate() {
-            let (foreground, background, text) = match systemd.state(service) {
+impl<'a> ServiceDisplay<'a> {
+    fn new(names: &'a [&'a str]) -> Self {
+        ServiceDisplay {
+            systemd: Services::new().expect("dbus"),
+            names,
+        }
+    }
+    fn draw(&self, d: &mut Display) {
+        for (i, service) in self.names.iter().enumerate() {
+            let (foreground, background, text) = match self.systemd.state(service) {
                 Status::Running => (Color::Black, Color::White, "  RUNNING  "),
                 Status::Stopped => (Color::Red, Color::White, "  STOPPED  "),
                 Status::Failed => (Color::White, Color::Red, "  FAILED   "),
@@ -70,6 +55,38 @@ fn main() {
                     .into_iter(),
             );
         }
+    }
+}
+
+fn main() {
+    let services = vec!["sshd", "syncthing@matze", "smb", "mpd", "nfs"];
+
+    let mut black_buffer = [255u8; ROWS as usize * COLS as usize];
+    let mut red_buffer = [0u8; ROWS as usize * COLS as usize];
+    let mut inky = Inky::new(
+        COLS,
+        ROWS,
+        Rotation::Rotate0,
+        &mut black_buffer,
+        &mut red_buffer,
+    );
+    let status = ServiceDisplay::new(&services[..]);
+    inky.display(|d| {
+        d.draw(
+            ProFont24Point::render_str("TEST")
+                .stroke(Some(Color::Black))
+                .fill(Some(Color::White))
+                .translate(Coord::new(1, 1))
+                .into_iter(),
+        );
+        d.draw(
+            ProFont12Point::render_str("We're somewhat useless right now")
+                .stroke(Some(Color::Red))
+                .fill(Some(Color::White))
+                .translate(Coord::new(1, 30))
+                .into_iter(),
+        );
+        status.draw(d);
     })
     .expect("failed to draw");
 }
