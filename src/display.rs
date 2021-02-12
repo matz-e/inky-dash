@@ -1,7 +1,5 @@
-extern crate gpio_cdev;
 use gpio_cdev::{Chip, LineRequestFlags};
 
-extern crate linux_embedded_hal;
 use linux_embedded_hal::spidev::{SpiModeFlags, SpidevOptions};
 use linux_embedded_hal::sysfs_gpio::Direction;
 use linux_embedded_hal::Delay;

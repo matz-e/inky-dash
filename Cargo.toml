@@ -7,10 +7,10 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dbus = "0.8"
 embedded-graphics = "0.5.2"
 gpio-cdev = "0.3.0"
 profont = "0.3.0"
+psutil = "3.2.0"
 
 [dependencies.ssd1675]
 version = "0.2.0"

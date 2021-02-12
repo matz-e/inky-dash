@@ -13,35 +13,30 @@ mod display;
 use display::{Display, Inky};
 
 mod service;
-use service::{Services, Status};
 
 const COLS: u16 = 400;
 const ROWS: u16 = 300;
 
 struct ServiceDisplay<'a> {
-    systemd: Services,
     names: &'a [&'a str],
 }
 
 impl<'a> ServiceDisplay<'a> {
     fn new(names: &'a [&'a str]) -> Self {
         ServiceDisplay {
-            systemd: Services::new().expect("dbus"),
             names,
         }
     }
+
     fn draw(&self, d: &mut Display) {
-        for (i, service) in self.names.iter().enumerate() {
-            let (foreground, background, text) = match self.systemd.state(service) {
-                Status::Running => (Color::Black, Color::White, "  RUNNING  "),
-                Status::Stopped => (Color::Red, Color::White, "  STOPPED  "),
-                Status::Failed => (Color::White, Color::Red, "  FAILED   "),
-                Status::Unavailable => (Color::White, Color::Red, " NOT FOUND "),
-                Status::Unknown => (Color::White, Color::Red, "  UNKNOWN  "),
+        for (i, (name, state)) in service::state(self.names).iter().enumerate() {
+            let (foreground, background, text) = match state {
+                service::Status::Good => (Color::Black, Color::White, "  RUNNING  "),
+                service::Status::Bad => (Color::White, Color::Red, "  STOPPED  "),
             };
-            let y = ROWS as i32 - 1 - (i as i32 + 1) * 11;
+            let y = ROWS as i32 - 1 - ((self.names.len() - i) as i32) * 11;
             d.draw(
-                ProFont9Point::render_str(service)
+                ProFont9Point::render_str(name)
                     .stroke(Some(Color::Black))
                     .fill(Some(Color::White))
                     .translate(Coord::new(1, y))
@@ -51,7 +46,7 @@ impl<'a> ServiceDisplay<'a> {
                 ProFont9Point::render_str(text)
                     .stroke(Some(foreground))
                     .fill(Some(background))
-                    .translate(Coord::new(150, y))
+                    .translate(Coord::new(100, y))
                     .into_iter(),
             );
         }
@@ -59,7 +54,7 @@ impl<'a> ServiceDisplay<'a> {
 }
 
 fn main() {
-    let services = vec!["sshd", "syncthing@matze", "smb", "mpd", "nfs"];
+    let services = vec!["sshd", "syncthing", "smbd", "mpd", "nfsd"];
 
     let mut black_buffer = [255u8; ROWS as usize * COLS as usize];
     let mut red_buffer = [0u8; ROWS as usize * COLS as usize];
